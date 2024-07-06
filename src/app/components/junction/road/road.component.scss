@@ -1,0 +1,35 @@
+.road{
+    background-color: #333;
+    position-anchor: --traffic-light;
+    position: absolute;
+    box-sizing: border-box;
+    &.active-road {
+        z-index: 1;
+    }
+    .cars{
+     display: flex;
+     gap: 1.5rem;
+     height: 3rem;
+     align-items: center;
+     justify-content: flex-end;
+    }
+    &.horizontal {
+        height: 3rem;
+        width: 100%;
+
+        bottom: anchor(bottom);
+        justify-self: anchor-center;
+    }
+
+    &.vertical {
+        height: 100%;
+        width: 3rem;
+        .cars{
+            transform: rotate(-90deg);
+            flex-direction: column;
+        }
+        left: anchor(left);
+        align-self: anchor-center;
+        padding-top: 1.5rem;
+    }
+}
