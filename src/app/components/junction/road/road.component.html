@@ -1,21 +1,20 @@
 <div class="road" [class]="classes" #road>
 
-    <div class="cars">
-        @for (item of data(); track item) {
+        @for (item of cars(); track item) {
         <car [@moveCar]="anim"></car>
             
         } @empty {
         <span>There are no items.</span>
         }
-    </div>
 </div>
 
 
 
-
-<!-- <button  (click)="cl(road)"
-[style.position]='"fixed"'
-[style.right.%]='50'
-[style.bottom.%]='bottom()'
->{{anim}}
+<!-- 
+<button  
+    (click)="cl(road)"
+    [style.position]='"fixed"'
+    [style.right.%]='50'
+    [style.bottom.%]='bottom()'
+    >{{anim}}
 </button> -->

@@ -3,33 +3,30 @@
     position-anchor: --traffic-light;
     position: absolute;
     box-sizing: border-box;
+    display: flex;
     &.active-road {
         z-index: 1;
-    }
-    .cars{
-     display: flex;
-     gap: 1.5rem;
-     height: 3rem;
-     align-items: center;
-     justify-content: flex-end;
     }
     &.horizontal {
         height: 3rem;
         width: 100%;
-
+        align-items: center;
         bottom: anchor(bottom);
         justify-self: anchor-center;
+        padding-left: calc(100% / 2 + 1.5rem);
     }
 
     &.vertical {
         height: 100%;
         width: 3rem;
-        .cars{
-            transform: rotate(-90deg);
-            flex-direction: column;
-        }
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: center;
         left: anchor(left);
         align-self: anchor-center;
-        padding-top: 1.5rem;
+        padding-bottom: calc(100% / 2 + 1.5rem);
+        car main {
+            transform: rotate(-90deg);
+        }
     }
 }

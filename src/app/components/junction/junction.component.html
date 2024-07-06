@@ -1,5 +1,7 @@
 <main class="m">
-        <trafficlight></trafficlight>
+        
+        <trafficlight [lightState]="state().lightState"></trafficlight>
 </main>
-<road [(data)]='data' [classes]='clss' ></road>
-<road [data]="data2" (dataChange)='data2' [classes]='horClss'></road>
+        
+<road [(data)]='state().vertical' [classes]='clss' ></road>
+<road [(data)]="state().horizontal" [classes]='horClss'></road>

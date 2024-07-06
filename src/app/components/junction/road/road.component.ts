@@ -1,8 +1,9 @@
-import { Component, input, Input, model, ModelSignal, OnInit, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
+import { Component, computed, input, Input, model, ModelSignal, OnInit, Signal, signal, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { CarComponent } from '../../car/car.component';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Road } from '../../../shared/models/road';
 
 @Component({
   selector: 'road',
@@ -22,34 +23,34 @@ import { FormsModule } from '@angular/forms';
   ]
 })
 export class RoadComponent implements OnInit{
-  // @Input() carCount!:number[];
   @Input() classes!:string[];
   anim:'start' | 'end' = 'start';
-  data:ModelSignal<number[]> = model.required<number[]>();
-
+  data:ModelSignal<Road> = model.required<Road>();
+  cars:Signal<number[]> = computed( ()=> {
+      const carsAmount = this.data().carCount;
+      return Array.from({length: carsAmount});
+  })
   ngOnInit(): void {
     
     if(this.classes.includes('vertical')){
       // this.setupVerticalRoad(start, end);
     }
   }
-cl(road:HTMLDivElement){
-  road.classList.remove('active-road');
-  this.anim = 'end'
-}
+
+  cl(road:HTMLDivElement){
+    // road.classList.remove('active-road');
+    if(road.classList.contains('horizontal')) {
+      road.classList.add('active-road');
+    }
+    this.anim = 'end'
+  }
   setupVerticalRoad(start: number, end: number) {
 
   }
-bottom(){
-  return Math.random()*75;
-}  
+  
+  bottom(){
+    return Math.random()*75;
+  }  
 
 }
 
-type Road = {
-  orientation:string;
-  start: number;
-  end: number;
-  width: number;
-  carCount:number;
-}
