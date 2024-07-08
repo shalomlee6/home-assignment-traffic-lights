@@ -3,5 +3,7 @@
         <trafficlight [lightState]="state().lightState"></trafficlight>
 </main>
         
-<road [(data)]='state().vertical' [classes]='clss' ></road>
-<road [(data)]="state().horizontal" [classes]='horClss'></road>
+<road #vertical [(data)]='state().vertical'  [classes]='clss' ></road>
+<road #horizontal [(data)]="state().horizontal"   [classes]='horClss'></road>
+
+<button [style.position]='"absolute"' [style.right]="'100px'" (click)="onStart()" >Start</button>

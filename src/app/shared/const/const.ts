@@ -10,7 +10,7 @@ export enum Orientation {
    VERTICAL =  'vertical'
 } 
 export const initialLight = {
-    'horizontal': LightColor.GREEN,
+    'horizontal': LightColor.RED,
     'vertical': LightColor.RED
 }
 export const junctionInitialState = {

@@ -1,20 +1,13 @@
 <div class="road" [class]="classes" #road>
 
-        @for (item of cars(); track item) {
-        <car [@moveCar]="anim"></car>
+        @for (item of cars; track item) {
+        <car *ngIf="orientation == 'horizontal' && !animationEnded" [@moveCarX]="animationStateX" (@moveCarX.done)="onXAnimationEnd(road)"></car>
+        <car *ngIf="orientation == 'vertical' && !animationEnded"   [@moveCarY]="animationStateY" (@moveCarY.done)="onYAnimationEnd()"></car>
             
         } @empty {
         <span>There are no items.</span>
         }
 </div>
 
+<button [style.position]='"absolute"' [style.right]="'100px'" (click)="orientation == 'horizontal' ? toggleAnimationX() : toggleAnimationY()">Toggle Animation</button>
 
-
-<!-- 
-<button  
-    (click)="cl(road)"
-    [style.position]='"fixed"'
-    [style.right.%]='50'
-    [style.bottom.%]='bottom()'
-    >{{anim}}
-</button> -->
