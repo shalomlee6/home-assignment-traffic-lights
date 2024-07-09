@@ -3,7 +3,7 @@
         <trafficlight [lightState]="state().lightState"></trafficlight>
 </main>
         
-<road #vertical [(data)]='state().vertical'  [classes]='clss' ></road>
-<road #horizontal [(data)]="state().horizontal"   [classes]='horClss'></road>
+<road #vertical [data]='state().vertical' (carsInRoad)="onMoreCars($event)" [classes]='clss' ></road>
+<road #horizontal [data]="state().horizontal" (carsInRoad)="onMoreCars($event)"  [classes]='horClss'></road>
 
 <button [style.position]='"absolute"' [style.right]="'100px'" (click)="onStart()" >Start</button>

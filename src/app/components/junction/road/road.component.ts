@@ -1,9 +1,10 @@
-import { Component, computed, ElementRef, EventEmitter, input, Input, model, ModelSignal, OnInit, Output, Signal, signal, ViewChild, ViewEncapsulation, WritableSignal } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input,OnChanges, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CarComponent } from '../../car/car.component';
-import { trigger, state, style, transition, animate, AnimationTriggerMetadata } from '@angular/animations';
+import { trigger, style, transition, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Road } from '../../../shared/models/road';
+import { Orientation } from '../../../shared/const/const';
 
 @Component({
   selector: 'road',
@@ -14,44 +15,59 @@ import { Road } from '../../../shared/models/road';
   encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('moveCarX', [
-      state('start', style({ transform: 'translateX(0)'})),
-      state('end', style({ transform: 'translateX(-20rem)' })), 
-      transition('start => end', [
-        animate('2s linear') 
-      ])
+      transition(':enter', [
+        style({ transform: 'translateX(5rem)'}),
+        animate('2s linear',style({ transform: 'translateX(0rem)'})) 
+      ]),
+      transition(':leave', [
+        style({ transform: 'translateX(0rem)'}),
+        animate('2s linear',style({ transform: 'translateX(-20rem)'})) 
+      ]),
     ]),
     trigger('moveCarY', [
-      state('start', style({ transform: 'translateY(0)'})),
-      state('end', style({ transform: 'translateY(18rem)' })), 
-      transition('start => end', [
-        animate('2s linear') 
+      transition(':enter', [
+        style({ transform: 'translateY(-3rem)'}),
+        animate('2s linear',style({ transform: 'translateY(0)'})) 
+      ]),
+      transition(':leave', [
+        style({ transform: 'translateY(0rem)'}),
+        animate('2s linear',style({ transform: 'translateY(18rem)'})) 
       ])
-    ])
+    ]),
   ]
   
 })
-export class RoadComponent implements OnInit{
-  
+export class RoadComponent implements OnInit,OnChanges{
+
+  @Input() data!:Road;
   @Input() classes!:string[];
   @Output() carsInRoad: EventEmitter<{orientation: string, carCount: number }> = new EventEmitter();
   @ViewChild('road') road!: ElementRef;
-
-  animationEnded: boolean = false;
+  animationEndedX: boolean = false;
+  animationEndedY: boolean = false;
   orientation!: string;
   animationStateX:'start' | 'end' = 'start';
   animationStateY:'start' | 'end' = 'start';
-  data:ModelSignal<Road> = model.required<Road>();
   cars!:number[];
+
   ngOnInit(): void {
-    
     if(this.classes.includes('vertical')){
-      // this.setupVerticalRoad(start, end);
       this.orientation = 'vertical' 
     }else {
       this.orientation = 'horizontal'
     }
-    const carsAmount = this.data().carCount;
-    this.cars = Array.from({length: carsAmount});
+  }
+
+  ngOnChanges(): void {
+    if(this.data.carCount > 0 ) {
+      this.cars = [...Array.from({length: this.data.carCount}) as number[]];
+      if(this.data.orientation === Orientation.HORIZONTAL && this.animationStateX === 'end') {
+        this.toggleAnimationX()
+      }
+      if(this.data.orientation === Orientation.VERTICAL && this.animationStateY === 'end') {
+        this.toggleAnimationY()
+      }
+    }
   }
 
   toggleAnimationX() {
@@ -59,57 +75,50 @@ export class RoadComponent implements OnInit{
     // add activeRoad Horizontal for smooth animation
     this.road.nativeElement.classList.add('active-road');
     // Clear the cars
-    this.animationEnded = false;
-    // if(this.data().carCount === 0) {
-    //   const carsAmount = this.data().carCount;
-    //   this.cars = Array.from({length: carsAmount});
-    // }
+    this.animationEndedX = false;
     this.animationStateX =  this.animationStateX === 'start' ? 'end' : 'start';
-    // setTimeout(() => {
-    //   // trigger animation
-    // }, 2000); // Adjust delay as needed
   }
 
   toggleAnimationY() {
     // Clear the cars
-    this.animationEnded = false;
+    this.animationEndedY = false;
     // trigger animation
     this.animationStateY =  this.animationStateY === 'start' ? 'end' : 'start';
-    // setTimeout(() => {
-    // }, 2000); // Adjust delay as needed
-   
   }
 
-  onXAnimationEnd(road:HTMLDivElement) {
-    if(this.data().carCount < 1 ) return;
-    // remove activeRoad Horizontal for smooth animation
-    if(road.classList.contains('horizontal') && this.animationStateX === 'end') {
-      road.classList.remove('active-road');
-    }
-    
+  onXAnimationEnd(id:number) {
+    if(this.data.carCount < 1 ) return;
+
     if(this.animationStateX === 'end') {
-      this.animationEnded = true;
-      this.data().carCount= this.data().carCount - 1;
-      this.cars = Array.from({length: this.data().carCount});
-      // if(this.data().carCount === 0 ){
-      //   this.toggleAnimationX()
-      // }
+      this.cars.splice(id);
+      this.data.carCount= this.data.carCount - 1;
+      if(this.data.carCount === 0 ) {
+        this.animationEndedX = true;
+        // remove activeRoad Horizontal for smooth animation
+        setTimeout(()=> {
+          this.road.nativeElement.classList.remove('active-road');
+        },1000)
+        
+        setTimeout( ()=> {
+          this.carsInRoad.emit({orientation: 'horizontal', carCount: 0})
+        },10000 )
+      }
     }
   }
 
-  onYAnimationEnd() {
-    if(this.data().carCount < 1 ) return;
+  onYAnimationEnd(id:number) {
+    if(this.data.carCount < 1 ) return;
     
     if(this.animationStateY === 'end') {
-      this.animationEnded = true;
-      this.data().carCount= this.data().carCount - 1;
-      
-      this.cars = Array.from({length: this.data().carCount});
-      // if(this.data().carCount === 0 ){
-      //   this.toggleAnimationY()
-      // }
+      this.cars.splice(id);
+      this.data.carCount= this.data.carCount - 1;
+      if(this.data.carCount === 0 ) {
+        this.animationEndedY = true;
+        setTimeout( ()=> {
+          this.carsInRoad.emit({orientation: 'vertical', carCount: 0})
+        },12000 )
+      }
     }
   }
-
 }
 

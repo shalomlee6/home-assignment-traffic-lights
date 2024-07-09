@@ -28,10 +28,8 @@ export class JunctionComponent implements OnInit {
   });
 
   ngOnInit(): void {
-
-
+    //this.onStart()
   }
-
   onStart() {
     setInterval(() => {
       // update get referefnced value and returns updated value
@@ -39,15 +37,7 @@ export class JunctionComponent implements OnInit {
         const newState = {...state};
         const switchLight = this.getLightState()
         newState.lightState = switchLight;
-
-        if(this.horizontalRoad.animationStateX === 'end' && this.horizontalCarCount() === 0) {
-          // this.horizontalRoad.animationStateX = 'start'
-          this.state().horizontal.carCount = this.randCarCount();
-        }
-        if(this.verticalRoad.animationStateY === 'end' && this.verticalCarCount() === 0) {
-          // this.verticalRoad.animationStateY = 'start';
-          this.state().vertical.carCount =  this.randCarCount();
-        }
+        this.setAnimation()
 
         return newState;
 
@@ -63,24 +53,18 @@ export class JunctionComponent implements OnInit {
   getLightState() {
 
     if(this.horizontalCarCount() > this.verticalCarCount() ) {
-
-      if(this.horizontalRoad.animationStateX === 'start') {
-        this.horizontalRoad.toggleAnimationX()
-      }
       return {
         horizontal: LightColor.GREEN,
         vertical: LightColor.RED
       };
     }
-    if(this.horizontalCarCount() < this.verticalCarCount() && this.verticalRoad.animationStateY === 'start') {
-      this.verticalRoad.toggleAnimationY()
+    if(this.horizontalCarCount() < this.verticalCarCount()) {
       return {
         horizontal: LightColor.RED,
         vertical: LightColor.GREEN
       };
     }
-    if(this.horizontalCarCount() === this.verticalCarCount() && this.horizontalCarCount() > 0 && this.verticalCarCount() > 0 && this.horizontalRoad.animationStateX === 'start') {
-      this.horizontalRoad.toggleAnimationX()
+    if(this.horizontalCarCount() === this.verticalCarCount() && this.horizontalCarCount() > 0 && this.verticalCarCount() > 0) {
       return {
         horizontal: LightColor.GREEN,
         vertical: LightColor.RED
@@ -94,8 +78,50 @@ export class JunctionComponent implements OnInit {
     }
 
     return {
-      horizontal: LightColor.GREEN,
+      horizontal: LightColor.RED,
       vertical: LightColor.RED
     };
+  }
+
+  setAnimation(){
+    
+    if(this.state().lightState.horizontal === LightColor.GREEN && this.state().lightState.vertical === LightColor.RED ) {
+      if(this.horizontalRoad.animationStateX === 'start') {
+        this.horizontalRoad.toggleAnimationX()
+      }
+    }
+    if(this.state().lightState.horizontal === LightColor.RED && this.state().lightState.vertical === LightColor.GREEN ) {
+      if(this.verticalRoad.animationStateY === 'start') {
+        this.verticalRoad.toggleAnimationY();
+      }
+    }
+    if(this.state().lightState.horizontal === LightColor.RED && this.state().lightState.vertical === LightColor.RED) {
+      if(this.horizontalRoad.animationStateX === 'start') {
+        this.horizontalRoad.toggleAnimationX()
+      }
+    }
+  }
+
+  onMoreCars( event: any) {
+    
+    if(event.orientation === Orientation.HORIZONTAL) {
+      this.state.update((state:JunctionState) =>  ({
+        ...state,
+         horizontal:{
+          carCount: this.randCarCount(),
+          orientation: Orientation.HORIZONTAL 
+         }
+      }));
+    }
+    if(event.orientation === Orientation.VERTICAL) {
+      this.state.update((state:JunctionState) =>  ({
+        ...state,
+         vertical:{
+          carCount: this.randCarCount(),
+          orientation: Orientation.VERTICAL 
+         }
+      }));
+    }
+    
   }
 }
